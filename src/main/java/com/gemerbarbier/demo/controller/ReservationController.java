@@ -44,4 +44,9 @@ public class ReservationController {
     ) {
          return repository.findAll();
     }
+
+    @GetMapping("/")
+    public String helloWorld() {
+         return "Hello World";
+    }
 }
