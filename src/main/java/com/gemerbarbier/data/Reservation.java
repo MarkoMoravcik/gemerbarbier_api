@@ -1,4 +1,4 @@
-package com.gemerbarbier.demo.data;
+package com.gemerbarbier.data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -41,6 +41,9 @@ public class Reservation {
 
     @NonNull
     public String phoneNumber;
+
+    @NonNull
+    public String barber; 
 
     public String note;
 

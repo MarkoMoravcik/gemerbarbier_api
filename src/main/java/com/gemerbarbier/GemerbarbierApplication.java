@@ -1,4 +1,4 @@
-package com.gemerbarbier.demo;
+package com.gemerbarbier;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

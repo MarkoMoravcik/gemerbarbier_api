@@ -9,11 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.gemerbarbier</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>gemerbarbier</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>gemerbarbier</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Gemerbarbier API</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -45,7 +45,7 @@
   			<groupId>org.postgresql</groupId>
   			<artifactId>postgresql</artifactId>
 		</dependency>
-		<!--<dependency>
+		<!-- <dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
@@ -54,7 +54,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
-		</dependency>-->
+		</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

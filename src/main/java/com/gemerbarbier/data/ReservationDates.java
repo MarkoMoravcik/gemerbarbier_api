@@ -1,11 +1,10 @@
-package com.gemerbarbier.demo.data;
+package com.gemerbarbier.data;
 
 import java.util.List;
-
-import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
+import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import javax.persistence.Entity;
@@ -19,6 +18,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Data
 @Getter
@@ -26,18 +26,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Builder
+@Table(
+    uniqueConstraints = { @UniqueConstraint( columnNames = {"date", "barber"} ) }
+)
 public class ReservationDates {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @Basic
+    @NonNull
     public String date;
+
+    @NonNull
+    public String barber;
 
     @ElementCollection
     @CollectionTable(name = "availableTimesList", 
-    uniqueConstraints = { @UniqueConstraint( columnNames = { "id", "time" } ) } , 
+    uniqueConstraints = { @UniqueConstraint( columnNames = { "id", "time"} ) } , 
     joinColumns = @JoinColumn(name = "id"))
     @Column(name = "time")
     private List<String> availableTimes;
