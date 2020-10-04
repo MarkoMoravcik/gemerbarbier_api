@@ -53,4 +53,9 @@ public class Reservation {
     @NonNull
     public String cutTag;
 
+    public String color;
+
+    public String startDateTime;
+
+    public String endDateTime;
 }

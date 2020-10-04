@@ -6,10 +6,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.gemerbarbier.config.ReservationDatesConfigConstats;
 import com.gemerbarbier.data.ReservationDates;
 import com.gemerbarbier.repository.ReservationDatesRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,12 +28,17 @@ public class ReservationDatesService {
         return repository.findByBarber(barber).stream().map(ReservationDates::getDate).collect(Collectors.toList());
     }
 
-    public List<String> findAvailableTimes(String date, String barber, String cutTime){
+    public List<String> findAvailableTimes(String date, String barber, String cutTag){
         List<String> times = repository.findByDateAndBarber(date, barber).getAvailableTimes();
-        if(cutTime.equals("40")){
-            times = filterTimesFor40Minutes(times);
-        }else if (cutTime.equals("60")){
-            times = filterTimesFor60Minutes(times);
+
+        switch (cutTag){
+            case ReservationDatesConfigConstats.BASIC_CUT_TAG:
+                times = filterTimesForBasicCut(times);
+                break;
+            case ReservationDatesConfigConstats.BASIC_BEARD_TAG:
+            case ReservationDatesConfigConstats.EXCLUSIVE_CUT_TAG:
+                times = filterTimesForExclusiveCut(times);
+                break;
         }
         return times;
     }
@@ -48,10 +55,15 @@ public class ReservationDatesService {
         availableTimes.remove(time);
         LocalTime parsedTime = LocalTime.parse(time);
 
-        if(cutTag.equals("BASIC_CUT")){
-            availableTimes.remove(parsedTime.plusMinutes(20).toString());
-        } else if (cutTag.equals("BASIC_BEARD") || cutTag.equals("EXCLUSIVE_CUT")){
-            availableTimes.remove(parsedTime.plusMinutes(40).toString());
+        switch (cutTag){
+            case ReservationDatesConfigConstats.BASIC_CUT_TAG:
+                availableTimes.remove(parsedTime.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString());
+                break;
+            case ReservationDatesConfigConstats.BASIC_BEARD_TAG:
+            case ReservationDatesConfigConstats.EXCLUSIVE_CUT_TAG:
+                availableTimes.remove(parsedTime.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString());
+                availableTimes.remove(parsedTime.plusMinutes(ReservationDatesConfigConstats.BASIC_CUT_TIME).toString());
+                break;
         }
 
         if (availableTimes.isEmpty()){
@@ -65,14 +77,14 @@ public class ReservationDatesService {
         repository.delete(dbDate);
     }
 
-    private List<String> filterTimesFor40Minutes(List<String> times){
+    private List<String> filterTimesForBasicCut(List<String> times){
         List<String> timesCp =  new ArrayList<>(times);
         List<String> filteredTimes  = new ArrayList<>();
         for(String t : times){
             Iterator<String> timesIterator = timesCp.iterator();
             timesIterator.next();
             LocalTime time = LocalTime.parse(t);
-            if(timesIterator.hasNext() && time.plusMinutes(20).toString().equals(timesIterator.next()) && timesIterator.hasNext() &&time.plusMinutes(40).toString().equals(timesIterator.next())){
+            if(timesIterator.hasNext() && time.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString().equals(timesIterator.next())){
                 filteredTimes.add(t);
             }
             timesCp.remove(t);
@@ -81,14 +93,15 @@ public class ReservationDatesService {
         return filteredTimes;
     }
 
-    private List<String> filterTimesFor60Minutes(List<String> times){
+    private List<String> filterTimesForExclusiveCut(List<String> times){
         List<String> timesCp =  new ArrayList<>(times);
         List<String> filteredTimes  = new ArrayList<>();
         for(String t : times){
             Iterator<String> timesIterator = timesCp.iterator();
             timesIterator.next();
             LocalTime time = LocalTime.parse(t);
-            if(timesIterator.hasNext() && time.plusMinutes(20).toString().equals(timesIterator.next())&& timesIterator.hasNext() && time.plusMinutes(40).toString().equals(timesIterator.next()) && timesIterator.hasNext() && time.plusMinutes(60).toString().equals(timesIterator.next())){
+            if(timesIterator.hasNext() && time.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString().equals(timesIterator.next())
+                && timesIterator.hasNext() && time.plusMinutes(ReservationDatesConfigConstats.BASIC_CUT_TIME).toString().equals(timesIterator.next())){
                 filteredTimes.add(t);
             }
             timesCp.remove(t);

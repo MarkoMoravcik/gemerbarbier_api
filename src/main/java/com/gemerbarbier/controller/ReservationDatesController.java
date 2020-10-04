@@ -37,8 +37,8 @@ public class ReservationDatesController {
     public List<String> getAllAvailableTimes(
         @RequestParam(name = "date", required = true) @NotNull String date,
         @RequestParam(name = "barber", required = true) @NotNull String barber,
-        @RequestParam(name = "cutTime", required = true) @NotNull String cutTime)  {
-        return service.findAvailableTimes(date, barber, cutTime);
+        @RequestParam(name = "cutTag", required = true) @NotNull String cutTag)  {
+        return service.findAvailableTimes(date, barber, cutTag);
     }
 
     @PostMapping("/newFullDate")
