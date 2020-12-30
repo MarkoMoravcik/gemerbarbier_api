@@ -1,12 +1,9 @@
 package com.gemerbarbier.data;
 
 import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -29,29 +26,20 @@ import lombok.NonNull;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(
-    uniqueConstraints = { @UniqueConstraint( columnNames = {"date", "barber"} ) }
-)
-public class ReservationDates {
+@Table
+public class ReservationTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @NonNull
-    public String date;
+    public String state;
+    
+    @NonNull
+    public String color;
 
     @NonNull
-    public String barber;
+    public String time;
 
-    // @ElementCollection
-    // @CollectionTable(name = "availableTimesList", 
-    // uniqueConstraints = { @UniqueConstraint( columnNames = { "id", "time"} ) } , 
-    // joinColumns = @JoinColumn(name = "id"))
-    // @Column(name = "time")
-    // private List<String> availableTimes;
-
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "reservationDates_id")
-    private List<ReservationTime> availableTimes;
 }

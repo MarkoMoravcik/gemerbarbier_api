@@ -23,14 +23,13 @@ public class ReservationDatesController {
     private ReservationDatesService service;
 
     @GetMapping("/reservationDates")
-    public List<ReservationDates> getDates(
-    @RequestParam(name = "barber", required = true) @NotNull String barber) {
+    public List<ReservationDates> getDates(@RequestParam(name = "barber", required = true) @NotNull String barber) {
         return service.findReservationDates(barber);
     }
 
     @GetMapping("/availableDates")
     public List<String> getAllAvailableDates(@RequestParam(name = "barber", required = true) @NotNull String barber) {
-        return service.findAllAvaiableDates(barber);    
+        return service.findAllAvaiableDates(barber);
     }
 
     @GetMapping("/availableTimes")
@@ -48,13 +47,29 @@ public class ReservationDatesController {
         service.createReservationDate(date, barber);
     }
 
-    @DeleteMapping("/deleteTime")
-    public void deleteTime(
+    @PostMapping("/deactiveTime")
+    public void deactiveTime(
+        @RequestParam(name = "date", required = true) @NotNull String date,
+        @RequestParam(name = "time", required = true) @NotNull String time,
+        @RequestParam(name = "barber", required = true) @NotNull String barber) {
+        service.deactiveTime(date, time, barber);
+    }
+
+    @PostMapping("/activateTime")
+    public void activateTime(
+        @RequestParam(name = "date", required = true) @NotNull String date,
+        @RequestParam(name = "time", required = true) @NotNull String time,
+        @RequestParam(name = "barber", required = true) @NotNull String barber) {
+        service.activateTime(date, time, barber);
+    }
+
+    @PostMapping("/reserveTime")
+    public void reserveTime(
         @RequestParam(name = "date", required = true) @NotNull String date,
         @RequestParam(name = "time", required = true) @NotNull String time,
         @RequestParam(name = "barber", required = true) @NotNull String barber,
         @RequestParam(name = "cutTag", required = true) @NotNull String cutTag) {
-        service.deleteTime(date, time, barber, cutTag);
+        service.reserveTime(date, time, barber, cutTag);
     }
 
     @DeleteMapping("/deleteDate")

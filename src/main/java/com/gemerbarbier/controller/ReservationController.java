@@ -9,6 +9,7 @@ import com.gemerbarbier.service.ReservationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,12 +32,11 @@ public class ReservationController {
     @RequestParam(name = "phoneNumber", required = true) @NotNull String phoneNumber,
     @RequestParam(name = "note", required = true) @NotNull String note,
     @RequestParam(name = "barber", required = true) @NotNull String barber,
-    @RequestParam(name = "cutType", required = true) @NotNull String cutType,
     @RequestParam(name = "cutTag", required = true) @NotNull String cutTag
     ) {
 
         service.createReservation(Reservation.builder().date(date).time(time).name(name).
-        surname(surname).email(email).phoneNumber(phoneNumber).note(note).barber(barber).cutType(cutType).cutTag(cutTag).build()); 
+        surname(surname).email(email).phoneNumber(phoneNumber).note(note).barber(barber).cutTag(cutTag).build()); 
     }
 
     @GetMapping("/reservations")
@@ -45,4 +45,13 @@ public class ReservationController {
     ) {
          return service.getReservations(barber);
     }
+
+    @DeleteMapping("/deleteReservation")
+    public void deleteReservation(
+        @RequestParam(name = "id", required = true) @NotNull Long id,
+        @RequestParam(name = "barber", required = true) @NotNull String barber) {
+         service.deleteReservation(id, barber);
+    }
+
+
 }
