@@ -27,26 +27,14 @@ public class ReservationDatesService {
         return reservationDates;
     }
 
-    public List<String> findAllAvaiableDates(String barber){
-        return repository.findByBarber(barber).stream().map(ReservationDates::getDate).collect(Collectors.toList());
+    public List<String> findAllAvaiableDates(String barber, String cutTag){
+        return repository.findByBarber(barber).stream().filter(date -> !collectAvailableTimes(date, cutTag).isEmpty()).map(ReservationDates::getDate).collect(Collectors.toList());
     }
 
     public List<String> findAvailableTimes(String date, String barber, String cutTag){
         Optional<ReservationDates> optDbDate = repository.findByDateAndBarber(date, barber);
         if(optDbDate.isPresent()){
-            List<ReservationTime> times = optDbDate.get().getAvailableTimes();
-            times = times.stream().filter(t->t.getState().equals(ReservationTimeConfigConstats.ACTIVE_STATE)).collect(Collectors.toList());
-            
-            switch (cutTag){
-                case ReservationDatesConfigConstats.BASIC_CUT_TAG:
-                    times = filterTimesForBasicCut(times);
-                    break;
-                case ReservationDatesConfigConstats.BASIC_BEARD_TAG:
-                case ReservationDatesConfigConstats.EXCLUSIVE_CUT_TAG:
-                    times = filterTimesForExclusiveCut(times);
-                    break;
-            }
-            return times.stream().map(t->t.getTime()).sorted().collect(Collectors.toList());
+            return collectAvailableTimes(optDbDate.get(), cutTag);
         }else{
             return null;
         }
@@ -179,4 +167,20 @@ public class ReservationDatesService {
         }
         return times;
     } 
+
+    private List<String> collectAvailableTimes(ReservationDates date, String cutTag){
+        List<ReservationTime> times = date.getAvailableTimes();
+        times = times.stream().filter(t->t.getState().equals(ReservationTimeConfigConstats.ACTIVE_STATE)).collect(Collectors.toList());
+        
+        switch (cutTag){
+            case ReservationDatesConfigConstats.BASIC_CUT_TAG:
+                times = filterTimesForBasicCut(times);
+                break;
+            case ReservationDatesConfigConstats.BASIC_BEARD_TAG:
+            case ReservationDatesConfigConstats.EXCLUSIVE_CUT_TAG:
+                times = filterTimesForExclusiveCut(times);
+                break;
+        }
+        return times.stream().map(t->t.getTime()).sorted().collect(Collectors.toList());
+    }
 }

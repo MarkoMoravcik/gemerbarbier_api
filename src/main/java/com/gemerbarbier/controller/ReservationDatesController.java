@@ -28,8 +28,10 @@ public class ReservationDatesController {
     }
 
     @GetMapping("/availableDates")
-    public List<String> getAllAvailableDates(@RequestParam(name = "barber", required = true) @NotNull String barber) {
-        return service.findAllAvaiableDates(barber);
+    public List<String> getAllAvailableDates(
+        @RequestParam(name = "barber", required = true) @NotNull String barber,
+        @RequestParam(name = "cutTag", required = true) @NotNull String cutTag) {
+        return service.findAllAvaiableDates(barber, cutTag);
     }
 
     @GetMapping("/availableTimes")

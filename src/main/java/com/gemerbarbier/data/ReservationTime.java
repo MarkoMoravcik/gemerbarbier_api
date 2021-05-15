@@ -10,12 +10,10 @@ import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Data
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
