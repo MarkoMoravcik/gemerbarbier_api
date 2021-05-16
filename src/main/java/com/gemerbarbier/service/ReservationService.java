@@ -7,8 +7,8 @@ import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
 
-import com.gemerbarbier.config.ReservationDatesConfigConstats;
-import com.gemerbarbier.config.ReservationTimeConfigConstats;
+import com.gemerbarbier.config.ReservationDatesConfigConstants;
+import com.gemerbarbier.config.ReservationTimeConfigConstants;
 import com.gemerbarbier.data.Reservation;
 import com.gemerbarbier.data.ReservationDates;
 import com.gemerbarbier.data.ReservationTime;
@@ -34,25 +34,25 @@ public class ReservationService {
         reservation.setStartDateTime(createDateTime(parsedDate, parsedTime, 0L));
 
         switch (reservation.getCutTag()) {
-            case ReservationDatesConfigConstats.BEARD_TAG:
-              reservation.setEndDateTime(createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstats.BEARD_TIME));
-              reservation.setColor(ReservationDatesConfigConstats.BEARD_COLOR);
-              reservation.setCutType(ReservationDatesConfigConstats.BEARD_NAME);
+            case ReservationDatesConfigConstants.BEARD_TAG:
+              reservation.setEndDateTime(createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstants.BEARD_TIME));
+              reservation.setColor(ReservationDatesConfigConstants.BEARD_COLOR);
+              reservation.setCutType(ReservationDatesConfigConstants.BEARD_NAME);
               break;
-            case ReservationDatesConfigConstats.BASIC_CUT_TAG:
-              reservation.setEndDateTime(createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstats.BASIC_CUT_TIME));
-              reservation.setColor(ReservationDatesConfigConstats.BASIC_CUT_COLOR);
-              reservation.setCutType(ReservationDatesConfigConstats.BASIC_CUT_NAME);
+            case ReservationDatesConfigConstants.BASIC_CUT_TAG:
+              reservation.setEndDateTime(createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstants.BASIC_CUT_TIME));
+              reservation.setColor(ReservationDatesConfigConstants.BASIC_CUT_COLOR);
+              reservation.setCutType(ReservationDatesConfigConstants.BASIC_CUT_NAME);
               break;
-            case ReservationDatesConfigConstats.BASIC_BEARD_TAG:
-              reservation.setEndDateTime(createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstats.BASIC_BEARD_TIME));
-              reservation.setColor(ReservationDatesConfigConstats.BASIC_BEARD_COLOR);
-              reservation.setCutType(ReservationDatesConfigConstats.BASIC_BEARD_NAME);
+            case ReservationDatesConfigConstants.BASIC_BEARD_TAG:
+              reservation.setEndDateTime(createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstants.BASIC_BEARD_TIME));
+              reservation.setColor(ReservationDatesConfigConstants.BASIC_BEARD_COLOR);
+              reservation.setCutType(ReservationDatesConfigConstants.BASIC_BEARD_NAME);
               break;
-            case ReservationDatesConfigConstats.EXCLUSIVE_CUT_TAG:
-              reservation.setEndDateTime(createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstats.EXCLUSIVE_CUT_TIME));
-              reservation.setColor(ReservationDatesConfigConstats.EXCLUSIVE_CUT_COLOR);
-              reservation.setCutType(ReservationDatesConfigConstats.EXCLUSIVE_CUT_NAME);
+            case ReservationDatesConfigConstants.EXCLUSIVE_CUT_TAG:
+              reservation.setEndDateTime(createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstants.EXCLUSIVE_CUT_TIME));
+              reservation.setColor(ReservationDatesConfigConstants.EXCLUSIVE_CUT_COLOR);
+              reservation.setCutType(ReservationDatesConfigConstants.EXCLUSIVE_CUT_NAME);
               break;
           }
 
@@ -83,20 +83,20 @@ public class ReservationService {
   }
   
   private void updateTimes(Reservation reservation,ReservationDates dates, ReservationTime reservationTime){
-    reservationTime.setState(ReservationTimeConfigConstats.ACTIVE_STATE);
-    reservationTime.setColor(ReservationTimeConfigConstats.ACTIVE_COLOR);
+    reservationTime.setState(ReservationTimeConfigConstants.ACTIVE_STATE);
+    reservationTime.setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
     LocalTime localTime = LocalTime.parse(reservation.getTime());
     switch (reservation.getCutTag()){
-      case ReservationDatesConfigConstats.BASIC_CUT_TAG:
-        ReservationTime time =  dates.getAvailableTimes().stream().filter(t -> t.getTime().equals(localTime.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString())).findFirst().get();
-        time.setState(ReservationTimeConfigConstats.ACTIVE_STATE);
-        time.setColor(ReservationTimeConfigConstats.ACTIVE_COLOR);
+      case ReservationDatesConfigConstants.BASIC_CUT_TAG:
+        ReservationTime time =  dates.getAvailableTimes().stream().filter(t -> t.getTime().equals(localTime.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString())).findFirst().get();
+        time.setState(ReservationTimeConfigConstants.ACTIVE_STATE);
+        time.setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
         break;
-      case ReservationDatesConfigConstats.BASIC_BEARD_TAG:
-        dates.getAvailableTimes().stream().filter(t->t.getTime().equals(localTime.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString()) || t.getTime().equals(localTime.plusMinutes(ReservationDatesConfigConstats.BASIC_CUT_TIME).toString()))
+      case ReservationDatesConfigConstants.BASIC_BEARD_TAG:
+        dates.getAvailableTimes().stream().filter(t->t.getTime().equals(localTime.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString()) || t.getTime().equals(localTime.plusMinutes(ReservationDatesConfigConstants.BASIC_CUT_TIME).toString()))
         .forEach(r -> {
-          r.setState(ReservationTimeConfigConstats.ACTIVE_STATE);
-          r.setColor(ReservationTimeConfigConstats.ACTIVE_COLOR);
+          r.setState(ReservationTimeConfigConstants.ACTIVE_STATE);
+          r.setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
         });
         break;
   }

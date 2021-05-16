@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import com.gemerbarbier.config.ReservationDatesConfigConstats;
-import com.gemerbarbier.config.ReservationTimeConfigConstats;
+import com.gemerbarbier.config.ReservationDatesConfigConstants;
+import com.gemerbarbier.config.ReservationTimeConfigConstants;
 import com.gemerbarbier.data.ReservationDates;
 import com.gemerbarbier.data.ReservationTime;
 import com.gemerbarbier.repository.ReservationDatesRepository;
@@ -74,13 +74,13 @@ public class ReservationDatesService {
             LocalTime parsedTime = LocalTime.parse(time);
 
             switch (cutTag){
-                case ReservationDatesConfigConstats.BASIC_CUT_TAG:
-                    setTimeAsReserved(availableTimes, parsedTime.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString());
+                case ReservationDatesConfigConstants.BASIC_CUT_TAG:
+                    setTimeAsReserved(availableTimes, parsedTime.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString());
                     break;
-                case ReservationDatesConfigConstats.BASIC_BEARD_TAG:
-                case ReservationDatesConfigConstats.EXCLUSIVE_CUT_TAG:
-                    setTimeAsReserved(availableTimes, parsedTime.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString());
-                    setTimeAsReserved(availableTimes, parsedTime.plusMinutes(ReservationDatesConfigConstats.BASIC_CUT_TIME).toString());
+                case ReservationDatesConfigConstants.BASIC_BEARD_TAG:
+                case ReservationDatesConfigConstants.EXCLUSIVE_CUT_TAG:
+                    setTimeAsReserved(availableTimes, parsedTime.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString());
+                    setTimeAsReserved(availableTimes, parsedTime.plusMinutes(ReservationDatesConfigConstants.BASIC_CUT_TIME).toString());
                     break;
             }
             repository.save(optDbDate.get());
@@ -91,24 +91,24 @@ public class ReservationDatesService {
     private void setTimeAsActive(List<ReservationTime> availableTimes, String time){
         Optional<ReservationTime> optTimeToDeactive= availableTimes.stream().filter(t->t.getTime().equals(time)).findFirst();
         if( optTimeToDeactive.isPresent()){
-            optTimeToDeactive.get().setState(ReservationTimeConfigConstats.ACTIVE_STATE);
-            optTimeToDeactive.get().setColor(ReservationTimeConfigConstats.ACTIVE_COLOR);
+            optTimeToDeactive.get().setState(ReservationTimeConfigConstants.ACTIVE_STATE);
+            optTimeToDeactive.get().setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
         }
     }
 
     private void setTimeAsInactive(List<ReservationTime> availableTimes, String time){
         Optional<ReservationTime> optTimeToDeactive= availableTimes.stream().filter(t->t.getTime().equals(time)).findFirst();
         if( optTimeToDeactive.isPresent()){
-            optTimeToDeactive.get().setState(ReservationTimeConfigConstats.INACTIVE_STATE);
-            optTimeToDeactive.get().setColor(ReservationTimeConfigConstats.INACTIVE_COLOR);
+            optTimeToDeactive.get().setState(ReservationTimeConfigConstants.INACTIVE_STATE);
+            optTimeToDeactive.get().setColor(ReservationTimeConfigConstants.INACTIVE_COLOR);
         }
     }
 
     private void setTimeAsReserved(List<ReservationTime> availableTimes, String time){
         Optional<ReservationTime> optTimeToDeactive= availableTimes.stream().filter(t->t.getTime().equals(time)).findFirst();
         if( optTimeToDeactive.isPresent()){
-            optTimeToDeactive.get().setState(ReservationTimeConfigConstats.RESERVED_STATE);
-            optTimeToDeactive.get().setColor(ReservationTimeConfigConstats.RESERVED_COLOR);
+            optTimeToDeactive.get().setState(ReservationTimeConfigConstants.RESERVED_STATE);
+            optTimeToDeactive.get().setColor(ReservationTimeConfigConstants.RESERVED_COLOR);
         }
     }
 
@@ -126,7 +126,7 @@ public class ReservationDatesService {
             Iterator<ReservationTime> timesIterator = timesCp.iterator();
             timesIterator.next();
             LocalTime time = LocalTime.parse(t.getTime());
-            if(timesIterator.hasNext() && time.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString().equals(timesIterator.next().getTime())){
+            if(timesIterator.hasNext() && time.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString().equals(timesIterator.next().getTime())){
                 filteredTimes.add(t);
             }
             timesCp.remove(t);
@@ -142,8 +142,8 @@ public class ReservationDatesService {
             Iterator<ReservationTime> timesIterator = timesCp.iterator();
             timesIterator.next();
             LocalTime time = LocalTime.parse(t.getTime());
-            if(timesIterator.hasNext() && time.plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString().equals(timesIterator.next().getTime())
-                && timesIterator.hasNext() && time.plusMinutes(ReservationDatesConfigConstats.BASIC_CUT_TIME).toString().equals(timesIterator.next().getTime())){
+            if(timesIterator.hasNext() && time.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString().equals(timesIterator.next().getTime())
+                && timesIterator.hasNext() && time.plusMinutes(ReservationDatesConfigConstants.BASIC_CUT_TIME).toString().equals(timesIterator.next().getTime())){
                 filteredTimes.add(t);
             }
             timesCp.remove(t);
@@ -155,29 +155,33 @@ public class ReservationDatesService {
    private List<ReservationTime> createTimes(){
         List<ReservationTime> times = new ArrayList<>();
         
-        String initialTime = "10:00";
-        while(!initialTime.equals("13:00")){
-            times.add(ReservationTime.builder().state(ReservationTimeConfigConstats.ACTIVE_STATE).color(ReservationTimeConfigConstats.ACTIVE_COLOR).time(initialTime).build());
-            initialTime = LocalTime.parse(initialTime).plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString();
+        String initialTime = ReservationTimeConfigConstants.START_WORKING_TIME;
+        while(!initialTime.equals(ReservationTimeConfigConstants.START_LUNCH_TIME)){
+            times.add(ReservationTime.builder().state(ReservationTimeConfigConstants.ACTIVE_STATE).color(ReservationTimeConfigConstants.ACTIVE_COLOR).time(initialTime).build());
+            initialTime = LocalTime.parse(initialTime).plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString();
         }
-        initialTime = "14:00";
-        while(!initialTime.equals("16:00")){
-            times.add(ReservationTime.builder().state(ReservationTimeConfigConstats.ACTIVE_STATE).color(ReservationTimeConfigConstats.ACTIVE_COLOR).time(initialTime).build());
-            initialTime = LocalTime.parse(initialTime).plusMinutes(ReservationDatesConfigConstats.BEARD_TIME).toString();
+        initialTime = ReservationTimeConfigConstants.END_LUNCH_TIME;
+        while(!initialTime.equals(ReservationTimeConfigConstants.END_WORKING_TIME)){
+            times.add(ReservationTime.builder().state(ReservationTimeConfigConstants.ACTIVE_STATE).color(ReservationTimeConfigConstants.ACTIVE_COLOR).time(initialTime).build());
+            initialTime = LocalTime.parse(initialTime).plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString();
+        }
+        while(!initialTime.equals(ReservationTimeConfigConstants.END_EXTRA_TIME)){
+            times.add(ReservationTime.builder().state(ReservationTimeConfigConstants.INACTIVE_STATE).color(ReservationTimeConfigConstants.INACTIVE_COLOR).time(initialTime).build());
+            initialTime = LocalTime.parse(initialTime).plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString();
         }
         return times;
     } 
 
     private List<String> collectAvailableTimes(ReservationDates date, String cutTag){
         List<ReservationTime> times = date.getAvailableTimes();
-        times = times.stream().filter(t->t.getState().equals(ReservationTimeConfigConstats.ACTIVE_STATE)).collect(Collectors.toList());
+        times = times.stream().filter(t->t.getState().equals(ReservationTimeConfigConstants.ACTIVE_STATE)).collect(Collectors.toList());
         
         switch (cutTag){
-            case ReservationDatesConfigConstats.BASIC_CUT_TAG:
+            case ReservationDatesConfigConstants.BASIC_CUT_TAG:
                 times = filterTimesForBasicCut(times);
                 break;
-            case ReservationDatesConfigConstats.BASIC_BEARD_TAG:
-            case ReservationDatesConfigConstats.EXCLUSIVE_CUT_TAG:
+            case ReservationDatesConfigConstants.BASIC_BEARD_TAG:
+            case ReservationDatesConfigConstants.EXCLUSIVE_CUT_TAG:
                 times = filterTimesForExclusiveCut(times);
                 break;
         }

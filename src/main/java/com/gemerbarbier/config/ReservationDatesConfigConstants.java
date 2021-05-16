@@ -1,6 +1,6 @@
 package com.gemerbarbier.config;
 
-public class ReservationDatesConfigConstats {
+public class ReservationDatesConfigConstants {
 
     //BEARD
     public static final Long BEARD_TIME = 15l;
