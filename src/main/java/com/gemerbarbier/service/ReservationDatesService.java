@@ -89,10 +89,10 @@ public class ReservationDatesService {
     }
 
     private void setTimeAsActive(List<ReservationTime> availableTimes, String time){
-        Optional<ReservationTime> optTimeToDeactive= availableTimes.stream().filter(t->t.getTime().equals(time)).findFirst();
-        if( optTimeToDeactive.isPresent()){
-            optTimeToDeactive.get().setState(ReservationTimeConfigConstants.ACTIVE_STATE);
-            optTimeToDeactive.get().setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
+        Optional<ReservationTime> optTimeToActivate= availableTimes.stream().filter(t->t.getTime().equals(time)).findFirst();
+        if( optTimeToActivate.isPresent()){
+            optTimeToActivate.get().setState(ReservationTimeConfigConstants.ACTIVE_STATE);
+            optTimeToActivate.get().setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
         }
     }
 
@@ -105,10 +105,10 @@ public class ReservationDatesService {
     }
 
     private void setTimeAsReserved(List<ReservationTime> availableTimes, String time){
-        Optional<ReservationTime> optTimeToDeactive= availableTimes.stream().filter(t->t.getTime().equals(time)).findFirst();
-        if( optTimeToDeactive.isPresent()){
-            optTimeToDeactive.get().setState(ReservationTimeConfigConstants.RESERVED_STATE);
-            optTimeToDeactive.get().setColor(ReservationTimeConfigConstants.RESERVED_COLOR);
+        Optional<ReservationTime> optTimeToReserve= availableTimes.stream().filter(t->t.getTime().equals(time)).findFirst();
+        if( optTimeToReserve.isPresent()){
+            optTimeToReserve.get().setState(ReservationTimeConfigConstants.RESERVED_STATE);
+            optTimeToReserve.get().setColor(ReservationTimeConfigConstants.RESERVED_COLOR);
         }
     }
 
@@ -174,7 +174,7 @@ public class ReservationDatesService {
 
     private List<String> collectAvailableTimes(ReservationDates date, String cutTag){
         List<ReservationTime> times = date.getAvailableTimes();
-        times = times.stream().filter(t->t.getState().equals(ReservationTimeConfigConstants.ACTIVE_STATE)).collect(Collectors.toList());
+        times = times.stream().filter(t->t.getState().equals(ReservationTimeConfigConstants.ACTIVE_STATE)).sorted(Comparator.comparing(ReservationTime::getTime)).collect(Collectors.toList());
         
         switch (cutTag){
             case ReservationDatesConfigConstants.BASIC_CUT_TAG:

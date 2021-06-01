@@ -76,9 +76,9 @@ public class ReservationService {
           if(optTime.isPresent()){
             updateTimes(optReservation.get(),optDate.get(), optTime.get());
             datesRepository.save(optDate.get()); 
-            repository.deleteById(id);
           }
         }
+        repository.deleteById(id);
     }
   }
   
