@@ -39,13 +39,6 @@ public class ReservationDates {
     @NonNull
     public String barber;
 
-    // @ElementCollection
-    // @CollectionTable(name = "availableTimesList", 
-    // uniqueConstraints = { @UniqueConstraint( columnNames = { "id", "time"} ) } , 
-    // joinColumns = @JoinColumn(name = "id"))
-    // @Column(name = "time")
-    // private List<String> availableTimes;
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "reservationDates_id")
     private List<ReservationTime> availableTimes;

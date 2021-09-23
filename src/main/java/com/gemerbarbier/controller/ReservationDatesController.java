@@ -34,12 +34,27 @@ public class ReservationDatesController {
         return service.findAllAvaiableDates(barber, cutTag);
     }
 
+    @GetMapping("/allDates")
+    public List<String> getAllDates(
+        @RequestParam(name = "barber", required = true) @NotNull String barber,
+        @RequestParam(name = "cutTag", required = true) @NotNull String cutTag)  {
+            return service.findAllDates(barber, cutTag);
+    }
+
     @GetMapping("/availableTimes")
     public List<String> getAllAvailableTimes(
         @RequestParam(name = "date", required = true) @NotNull String date,
         @RequestParam(name = "barber", required = true) @NotNull String barber,
         @RequestParam(name = "cutTag", required = true) @NotNull String cutTag)  {
         return service.findAvailableTimes(date, barber, cutTag);
+    }
+
+    @GetMapping("/allTimes")
+    public List<String> getAllDates(
+        @RequestParam(name = "date", required = true) @NotNull String date,
+        @RequestParam(name = "barber", required = true) @NotNull String barber,
+        @RequestParam(name = "cutTag", required = true) @NotNull String cutTag)  {
+            return service.findAllTimes(date, barber, cutTag);
     }
 
     @PostMapping("/newFullDate")
@@ -63,6 +78,13 @@ public class ReservationDatesController {
         @RequestParam(name = "time", required = true) @NotNull String time,
         @RequestParam(name = "barber", required = true) @NotNull String barber) {
         service.activateTime(date, time, barber);
+    }
+
+    @PostMapping("/activateInactiveTimes")
+    public void activateTime(
+        @RequestParam(name = "date", required = true) @NotNull String date,
+        @RequestParam(name = "barber", required = true) @NotNull String barber) {
+        service.activateInactiveTimes(date, barber);
     }
 
     @PostMapping("/reserveTime")
