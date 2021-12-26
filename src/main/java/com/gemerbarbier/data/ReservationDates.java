@@ -25,8 +25,7 @@ import lombok.NonNull;
 @Entity
 @Builder
 @Table(
-    uniqueConstraints = { @UniqueConstraint( columnNames = {"date", "barber"} ) }
-)
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "barber"})})
 public class ReservationDates {
 
     @Id

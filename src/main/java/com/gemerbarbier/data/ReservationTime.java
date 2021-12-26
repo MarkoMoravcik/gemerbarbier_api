@@ -27,7 +27,7 @@ public class ReservationTime {
 
     @NonNull
     public String state;
-    
+
     @NonNull
     public String color;
 

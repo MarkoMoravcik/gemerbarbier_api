@@ -9,5 +9,4 @@ public class GemerbarbierApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(GemerbarbierApplication.class, args);
 	}
-
 }

@@ -19,8 +19,7 @@ import lombok.NonNull;
 @Entity
 @Builder
 @Table(
-    uniqueConstraints = { @UniqueConstraint( columnNames = {"date", "time","barber"} ) }
-)
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "time", "barber"})})
 public class Reservation {
 
     @Id
@@ -46,7 +45,7 @@ public class Reservation {
     public String phoneNumber;
 
     @NonNull
-    public String barber; 
+    public String barber;
 
     public String note;
 

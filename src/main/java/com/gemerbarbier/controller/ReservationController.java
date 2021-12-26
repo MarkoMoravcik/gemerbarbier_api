@@ -18,39 +18,37 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(maxAge = 3600)
 @RestController
 public class ReservationController {
-    
+
     @Autowired
     private ReservationService service;
 
     @PostMapping("/reservation")
     public void createReservation(
-    @RequestParam(name = "date", required = true) @NotNull String date,
-    @RequestParam(name = "time", required = true) @NotNull String time,
-    @RequestParam(name = "name", required = true) @NotNull String name,
-    @RequestParam(name = "surname", required = true) @NotNull String surname,
-    @RequestParam(name = "email", required = true) @NotNull String email,
-    @RequestParam(name = "phoneNumber", required = true) @NotNull String phoneNumber,
-    @RequestParam(name = "note", required = true) @NotNull String note,
-    @RequestParam(name = "barber", required = true) @NotNull String barber,
-    @RequestParam(name = "cutTag", required = true) @NotNull String cutTag
-    ) {
+            @RequestParam(name = "date", required = true) @NotNull String date,
+            @RequestParam(name = "time", required = true) @NotNull String time,
+            @RequestParam(name = "name", required = true) @NotNull String name,
+            @RequestParam(name = "surname", required = true) @NotNull String surname,
+            @RequestParam(name = "email", required = true) @NotNull String email,
+            @RequestParam(name = "phoneNumber", required = true) @NotNull String phoneNumber,
+            @RequestParam(name = "note", required = true) @NotNull String note,
+            @RequestParam(name = "barber", required = true) @NotNull String barber,
+            @RequestParam(name = "cutTag", required = true) @NotNull String cutTag) {
 
-        service.createReservation(Reservation.builder().date(date).time(time).name(name).
-        surname(surname).email(email).phoneNumber(phoneNumber).note(note).barber(barber).cutTag(cutTag).build()); 
+        service.createReservation(
+                Reservation.builder().date(date).time(time).name(name).surname(surname).email(email)
+                        .phoneNumber(phoneNumber).note(note).barber(barber).cutTag(cutTag).build());
     }
 
     @GetMapping("/reservations")
     public List<Reservation> getAllReservations(
-        @RequestParam(name = "barber", required = true) @NotNull String barber
-    ) {
-         return service.getReservations(barber);
+            @RequestParam(name = "barber", required = true) @NotNull String barber) {
+        return service.getReservations(barber);
     }
 
     @DeleteMapping("/deleteReservation")
-    public void deleteReservation(
-        @RequestParam(name = "id", required = true) @NotNull Long id,
-        @RequestParam(name = "barber", required = true) @NotNull String barber) {
-         service.deleteReservation(id, barber);
+    public void deleteReservation(@RequestParam(name = "id", required = true) @NotNull Long id,
+            @RequestParam(name = "barber", required = true) @NotNull String barber) {
+        service.deleteReservation(id, barber);
     }
 
 

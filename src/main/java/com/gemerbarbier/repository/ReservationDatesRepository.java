@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReservationDatesRepository extends JpaRepository<ReservationDates, Long> {
     Optional<ReservationDates> findByDate(String date);
+
     Optional<ReservationDates> findByDateAndBarber(String date, String barber);
+
     List<ReservationDates> findByBarber(String barber);
 }

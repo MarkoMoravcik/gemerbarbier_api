@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    List<Reservation> findByBarber(String barber); 
-    Optional<Reservation> findByIdAndBarber(Long id, String barber); 
+    List<Reservation> findByBarber(String barber);
+
+    Optional<Reservation> findByIdAndBarber(Long id, String barber);
+
     void deleteByIdAndBarber(Long id, String barber);
 }
