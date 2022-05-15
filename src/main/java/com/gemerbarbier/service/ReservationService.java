@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import javax.validation.constraints.NotNull;
 
-import com.gemerbarbier.config.ReservationDatesConfigConstants;
+import com.gemerbarbier.config.ReservationCutConfigEnum;
 import com.gemerbarbier.config.ReservationTimeConfigConstants;
 import com.gemerbarbier.data.Reservation;
 import com.gemerbarbier.data.ReservationDates;
@@ -31,34 +31,12 @@ public class ReservationService {
 
     LocalTime parsedTime = LocalTime.parse(reservation.getTime());
     String parsedDate = LocalDate.parse(reservation.getDate()).toString();
-    reservation.setStartDateTime(createDateTime(parsedDate, parsedTime, 0L));
+    ReservationCutConfigEnum cutType = ReservationCutConfigEnum.valueOf(reservation.getCutTag());
 
-    switch (reservation.getCutTag()) {
-      case ReservationDatesConfigConstants.BEARD_TAG:
-        reservation.setEndDateTime(
-            createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstants.BEARD_TIME));
-        reservation.setColor(ReservationDatesConfigConstants.BEARD_COLOR);
-        reservation.setCutType(ReservationDatesConfigConstants.BEARD_NAME);
-        break;
-      case ReservationDatesConfigConstants.BASIC_CUT_TAG:
-        reservation.setEndDateTime(
-            createDateTime(parsedDate, parsedTime, ReservationDatesConfigConstants.BASIC_CUT_TIME));
-        reservation.setColor(ReservationDatesConfigConstants.BASIC_CUT_COLOR);
-        reservation.setCutType(ReservationDatesConfigConstants.BASIC_CUT_NAME);
-        break;
-      case ReservationDatesConfigConstants.BASIC_BEARD_TAG:
-        reservation.setEndDateTime(createDateTime(parsedDate, parsedTime,
-            ReservationDatesConfigConstants.BASIC_BEARD_TIME));
-        reservation.setColor(ReservationDatesConfigConstants.BASIC_BEARD_COLOR);
-        reservation.setCutType(ReservationDatesConfigConstants.BASIC_BEARD_NAME);
-        break;
-      case ReservationDatesConfigConstants.EXCLUSIVE_CUT_TAG:
-        reservation.setEndDateTime(createDateTime(parsedDate, parsedTime,
-            ReservationDatesConfigConstants.EXCLUSIVE_CUT_TIME));
-        reservation.setColor(ReservationDatesConfigConstants.EXCLUSIVE_CUT_COLOR);
-        reservation.setCutType(ReservationDatesConfigConstants.EXCLUSIVE_CUT_NAME);
-        break;
-    }
+    reservation.setStartDateTime(createDateTime(parsedDate, parsedTime, 0L));
+    reservation.setEndDateTime(createDateTime(parsedDate, parsedTime, cutType.getCutTime()));
+    reservation.setColor(cutType.getCutColor());
+    reservation.setCutType(cutType.getCutName());
 
     repository.save(reservation);
   }
@@ -74,8 +52,7 @@ public class ReservationService {
   public void deleteReservation(@NotNull Long id, @NotNull String barber) {
     Optional<Reservation> optReservation = repository.findByIdAndBarber(id, barber);
     if (optReservation.isPresent()) {
-      Optional<ReservationDates> optDate =
-          datesRepository.findByDateAndBarber(optReservation.get().getDate(), barber);
+      Optional<ReservationDates> optDate = datesRepository.findByDateAndBarber(optReservation.get().getDate(), barber);
       if (optDate.isPresent()) {
         Optional<ReservationTime> optTime = optDate.get().getAvailableTimes().stream()
             .filter(t -> t.getTime().equals(optReservation.get().getTime())).findFirst();
@@ -90,30 +67,26 @@ public class ReservationService {
 
   private void updateTimes(Reservation reservation, ReservationDates dates,
       ReservationTime reservationTime) {
-    reservationTime.setState(ReservationTimeConfigConstants.ACTIVE_STATE);
-    reservationTime.setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
-    LocalTime localTime = LocalTime.parse(reservation.getTime());
-    switch (reservation.getCutTag()) {
-      case ReservationDatesConfigConstants.BASIC_CUT_TAG:
-        ReservationTime time = dates.getAvailableTimes().stream()
-            .filter(t -> t.getTime().equals(
-                localTime.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString()))
-            .findFirst().get();
-        time.setState(ReservationTimeConfigConstants.ACTIVE_STATE);
-        time.setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
-        break;
-      case ReservationDatesConfigConstants.BASIC_BEARD_TAG:
-        dates.getAvailableTimes().stream()
-            .filter(t -> t.getTime().equals(
-                localTime.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString())
-                || t.getTime()
-                    .equals(localTime.plusMinutes(ReservationDatesConfigConstants.BASIC_CUT_TIME)
-                        .toString()))
-            .forEach(r -> {
-              r.setState(ReservationTimeConfigConstants.ACTIVE_STATE);
-              r.setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
-            });
-        break;
+    ReservationCutConfigEnum cutType = ReservationCutConfigEnum.valueOf(reservation.getCutTag());
+    LocalTime parsedTime = LocalTime.parse(reservation.getTime());
+    Long cutTime = cutType.getCutTime();
+    Long plusMinutes = 0L;
+
+    while (cutTime >= ReservationTimeConfigConstants.BASE_TIME) {
+      setTimesAsActive(dates, parsedTime.plusMinutes(plusMinutes));
+      plusMinutes += ReservationTimeConfigConstants.BASE_TIME;
+      cutTime -= ReservationTimeConfigConstants.BASE_TIME;
+    }
+  }
+
+  private void setTimesAsActive(ReservationDates dates, LocalTime time) {
+    Optional<ReservationTime> optTime = dates.getAvailableTimes().stream()
+        .filter(t -> t.getTime().equals(
+            time.toString()))
+        .findFirst();
+    if (optTime.isPresent()) {
+      optTime.get().setState(ReservationTimeConfigConstants.ACTIVE_STATE);
+      optTime.get().setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
     }
   }
 }

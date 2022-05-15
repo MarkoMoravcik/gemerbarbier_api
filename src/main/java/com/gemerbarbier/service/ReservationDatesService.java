@@ -9,7 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import com.gemerbarbier.config.ReservationDatesConfigConstants;
+
+import com.gemerbarbier.config.ReservationCutConfigEnum;
 import com.gemerbarbier.config.ReservationTimeConfigConstants;
 import com.gemerbarbier.data.ReservationDates;
 import com.gemerbarbier.data.ReservationTime;
@@ -92,14 +93,14 @@ public class ReservationDatesService {
         }
     }
 
-
     public void activateInactiveTimes(String date, String barber) {
         Optional<ReservationDates> optDbDate = repository.findByDateAndBarber(date, barber);
         if (optDbDate.isPresent()) {
             List<ReservationTime> availableTimes = optDbDate.get().getAvailableTimes();
             availableTimes.stream()
-                    .filter(time -> !time.getTime().startsWith("16") && time.getState()
-                            .equals(ReservationTimeConfigConstants.INACTIVE_STATE))
+                    .filter(time -> !time.getTime().startsWith("08") && !time.getTime().startsWith("16")
+                            && !time.getTime().startsWith("17") && time.getState()
+                                    .equals(ReservationTimeConfigConstants.INACTIVE_STATE))
                     .forEach(time -> setTimeAsActive(availableTimes, time.getTime()));
             repository.save(optDbDate.get());
         }
@@ -121,26 +122,21 @@ public class ReservationDatesService {
 
     private void reserveConcreteTime(List<ReservationTime> availableTimes, String time,
             String cutTag) {
-        setTimeAsReserved(availableTimes, time);
         LocalTime parsedTime = LocalTime.parse(time);
-        switch (cutTag) {
-            case ReservationDatesConfigConstants.BASIC_CUT_TAG:
-                setTimeAsReserved(availableTimes, parsedTime
-                        .plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString());
-                break;
-            case ReservationDatesConfigConstants.BASIC_BEARD_TAG:
-            case ReservationDatesConfigConstants.EXCLUSIVE_CUT_TAG:
-                setTimeAsReserved(availableTimes, parsedTime
-                        .plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString());
-                setTimeAsReserved(availableTimes, parsedTime
-                        .plusMinutes(ReservationDatesConfigConstants.BASIC_CUT_TIME).toString());
-                break;
+        ReservationCutConfigEnum cutType = ReservationCutConfigEnum.valueOf(cutTag);
+        Long cutTime = cutType.getCutTime();
+        Long plusMinutes = 0l;
+
+        while (cutTime >= ReservationTimeConfigConstants.BASE_TIME) {
+            setTimeAsReserved(availableTimes, parsedTime.plusMinutes(plusMinutes).toString());
+            plusMinutes += ReservationTimeConfigConstants.BASE_TIME;
+            cutTime -= ReservationTimeConfigConstants.BASE_TIME;
         }
     }
 
     private void setTimeAsActive(List<ReservationTime> availableTimes, String time) {
-        Optional<ReservationTime> optTimeToActivate =
-                availableTimes.stream().filter(t -> t.getTime().equals(time)).findFirst();
+        Optional<ReservationTime> optTimeToActivate = availableTimes.stream().filter(t -> t.getTime().equals(time))
+                .findFirst();
         if (optTimeToActivate.isPresent()) {
             optTimeToActivate.get().setState(ReservationTimeConfigConstants.ACTIVE_STATE);
             optTimeToActivate.get().setColor(ReservationTimeConfigConstants.ACTIVE_COLOR);
@@ -148,8 +144,8 @@ public class ReservationDatesService {
     }
 
     private void setTimeAsInactive(List<ReservationTime> availableTimes, String time) {
-        Optional<ReservationTime> optTimeToDeactive =
-                availableTimes.stream().filter(t -> t.getTime().equals(time)).findFirst();
+        Optional<ReservationTime> optTimeToDeactive = availableTimes.stream().filter(t -> t.getTime().equals(time))
+                .findFirst();
         if (optTimeToDeactive.isPresent()) {
             optTimeToDeactive.get().setState(ReservationTimeConfigConstants.INACTIVE_STATE);
             optTimeToDeactive.get().setColor(ReservationTimeConfigConstants.INACTIVE_COLOR);
@@ -157,8 +153,8 @@ public class ReservationDatesService {
     }
 
     private void setTimeAsReserved(List<ReservationTime> availableTimes, String time) {
-        Optional<ReservationTime> optTimeToReserve =
-                availableTimes.stream().filter(t -> t.getTime().equals(time)).findFirst();
+        Optional<ReservationTime> optTimeToReserve = availableTimes.stream().filter(t -> t.getTime().equals(time))
+                .findFirst();
         if (optTimeToReserve.isPresent()) {
             optTimeToReserve.get().setState(ReservationTimeConfigConstants.RESERVED_STATE);
             optTimeToReserve.get().setColor(ReservationTimeConfigConstants.RESERVED_COLOR);
@@ -172,37 +168,28 @@ public class ReservationDatesService {
         }
     }
 
-    private List<ReservationTime> filterTimesForBasicCut(List<ReservationTime> times) {
+    private List<ReservationTime> filterTimes(List<ReservationTime> times, Long cutTime) {
         List<ReservationTime> timesCp = new ArrayList<>(times);
         List<ReservationTime> filteredTimes = new ArrayList<>();
         for (ReservationTime t : times) {
             Iterator<ReservationTime> timesIterator = timesCp.iterator();
             timesIterator.next();
             LocalTime time = LocalTime.parse(t.getTime());
-            if (timesIterator.hasNext()
-                    && time.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString()
-                            .equals(timesIterator.next().getTime())) {
-                filteredTimes.add(t);
+            Long cutTimeTmp = cutTime;
+            Long plusMinutes = ReservationTimeConfigConstants.BASE_TIME;
+            boolean shouldBeAdded = true;
+
+            while (cutTimeTmp > ReservationTimeConfigConstants.BASE_TIME) {
+                if (!timesIterator.hasNext()
+                        || !time.plusMinutes(plusMinutes).toString()
+                                .equals(timesIterator.next().getTime())) {
+                    shouldBeAdded = false;
+                    break;
+                }
+                plusMinutes += ReservationTimeConfigConstants.BASE_TIME;
+                cutTimeTmp -= ReservationTimeConfigConstants.BASE_TIME;
             }
-            timesCp.remove(t);
-        }
-
-        return filteredTimes;
-    }
-
-    private List<ReservationTime> filterTimesForExclusiveCut(List<ReservationTime> times) {
-        List<ReservationTime> timesCp = new ArrayList<>(times);
-        List<ReservationTime> filteredTimes = new ArrayList<>();
-        for (ReservationTime t : times) {
-            Iterator<ReservationTime> timesIterator = timesCp.iterator();
-            timesIterator.next();
-            LocalTime time = LocalTime.parse(t.getTime());
-            if (timesIterator.hasNext()
-                    && time.plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString()
-                            .equals(timesIterator.next().getTime())
-                    && timesIterator.hasNext()
-                    && time.plusMinutes(ReservationDatesConfigConstants.BASIC_CUT_TIME).toString()
-                            .equals(timesIterator.next().getTime())) {
+            if (shouldBeAdded) {
                 filteredTimes.add(t);
             }
             timesCp.remove(t);
@@ -213,29 +200,44 @@ public class ReservationDatesService {
 
     private List<ReservationTime> createTimes() {
         List<ReservationTime> times = new ArrayList<>();
-
-        String initialTime = ReservationTimeConfigConstants.START_WORKING_TIME;
-        while (!initialTime.equals(ReservationTimeConfigConstants.START_LUNCH_TIME)) {
-            times.add(ReservationTime.builder().state(ReservationTimeConfigConstants.ACTIVE_STATE)
-                    .color(ReservationTimeConfigConstants.ACTIVE_COLOR).time(initialTime).build());
-            initialTime = LocalTime.parse(initialTime)
-                    .plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString();
+        String time = ReservationTimeConfigConstants.START_EXTRA_TIME;
+        while (!time.equals(ReservationTimeConfigConstants.START_WORKING_TIME)) {
+            times.add(buildInactiveReservationTime(time));
+            time = LocalTime.parse(time)
+                    .plusMinutes(ReservationTimeConfigConstants.BASE_TIME).toString();
         }
-        initialTime = ReservationTimeConfigConstants.END_LUNCH_TIME;
-        while (!initialTime.equals(ReservationTimeConfigConstants.END_WORKING_TIME)) {
-            times.add(ReservationTime.builder().state(ReservationTimeConfigConstants.ACTIVE_STATE)
-                    .color(ReservationTimeConfigConstants.ACTIVE_COLOR).time(initialTime).build());
-            initialTime = LocalTime.parse(initialTime)
-                    .plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString();
+        while (!time.equals(ReservationTimeConfigConstants.START_LUNCH_TIME)) {
+            times.add(buildActiveReservationTime(time));
+            time = LocalTime.parse(time)
+                    .plusMinutes(ReservationTimeConfigConstants.BASE_TIME).toString();
         }
-        while (!initialTime.equals(ReservationTimeConfigConstants.END_EXTRA_TIME)) {
-            times.add(ReservationTime.builder().state(ReservationTimeConfigConstants.INACTIVE_STATE)
-                    .color(ReservationTimeConfigConstants.INACTIVE_COLOR).time(initialTime)
-                    .build());
-            initialTime = LocalTime.parse(initialTime)
-                    .plusMinutes(ReservationDatesConfigConstants.BEARD_TIME).toString();
+        time = ReservationTimeConfigConstants.END_LUNCH_TIME;
+        while (!time.equals(ReservationTimeConfigConstants.END_WORKING_TIME)) {
+            times.add(buildActiveReservationTime(time));
+            time = LocalTime.parse(time)
+                    .plusMinutes(ReservationTimeConfigConstants.BASE_TIME).toString();
+        }
+        while (!time.equals(ReservationTimeConfigConstants.END_EXTRA_TIME)) {
+            times.add(buildInactiveReservationTime(time));
+            time = addReservationBasicTimeToActualTime(time);
         }
         return times;
+    }
+
+    private ReservationTime buildActiveReservationTime(String time) {
+        return ReservationTime.builder().state(ReservationTimeConfigConstants.ACTIVE_STATE)
+                .color(ReservationTimeConfigConstants.ACTIVE_COLOR).time(time).build();
+    }
+
+    private ReservationTime buildInactiveReservationTime(String time) {
+        return ReservationTime.builder().state(ReservationTimeConfigConstants.INACTIVE_STATE)
+                .color(ReservationTimeConfigConstants.INACTIVE_COLOR).time(time)
+                .build();
+    }
+
+    private String addReservationBasicTimeToActualTime(String time) {
+        return LocalTime.parse(time)
+                .plusMinutes(ReservationTimeConfigConstants.BASE_TIME).toString();
     }
 
     private List<String> collectActiveTimes(ReservationDates date, String cutTag) {
@@ -243,7 +245,8 @@ public class ReservationDatesService {
                 .filter(t -> t.getState().equals(ReservationTimeConfigConstants.ACTIVE_STATE))
                 .sorted(Comparator.comparing(ReservationTime::getTime))
                 .collect(Collectors.toList());
-        return filterTimesForSpecificCut(times, cutTag).stream().map(t -> t.getTime()).sorted()
+        return filterTimesForSpecificCut(times, ReservationCutConfigEnum.valueOf(cutTag).getCutTime()).stream()
+                .map(t -> t.getTime()).sorted()
                 .collect(Collectors.toList());
     }
 
@@ -252,22 +255,15 @@ public class ReservationDatesService {
                 .filter(t -> !t.getState().equals(ReservationTimeConfigConstants.RESERVED_STATE))
                 .sorted(Comparator.comparing(ReservationTime::getTime))
                 .collect(Collectors.toList());
-        return filterTimesForSpecificCut(times, cutTag).stream().map(t -> t.getTime()).sorted()
+        return filterTimesForSpecificCut(times, ReservationCutConfigEnum.valueOf(cutTag).getCutTime()).stream()
+                .map(t -> t.getTime()).sorted()
                 .collect(Collectors.toList());
     }
 
     private List<ReservationTime> filterTimesForSpecificCut(List<ReservationTime> times,
-            String cutTag) {
-        switch (cutTag) {
-            case ReservationDatesConfigConstants.BASIC_CUT_TAG:
-                return filterTimesForBasicCut(times);
-            case ReservationDatesConfigConstants.BASIC_BEARD_TAG:
-            case ReservationDatesConfigConstants.EXCLUSIVE_CUT_TAG:
-                return filterTimesForExclusiveCut(times);
-        }
-        return times;
+            Long cutTime) {
+        return cutTime > ReservationTimeConfigConstants.BASE_TIME ? filterTimes(times, cutTime) : times;
     }
-
 
     private List<String> collectReservedDates(String barber) {
         return repository.findByBarber(barber).stream()

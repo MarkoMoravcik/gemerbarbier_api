@@ -11,9 +11,12 @@ public class ReservationTimeConfigConstants {
     public static final String RESERVED_COLOR = "orange";
     public static final String RESERVED_STATE = "Reserved";
 
+    public static final Long BASE_TIME = 20L;
+
+    public static final String START_EXTRA_TIME = "08:00";
     public static final String START_WORKING_TIME = "10:00";
     public static final String START_LUNCH_TIME = "13:00";
     public static final String END_LUNCH_TIME = "14:00";
     public static final String END_WORKING_TIME = "16:00";
-    public static final String END_EXTRA_TIME = "17:00";
+    public static final String END_EXTRA_TIME = "18:00";
 }

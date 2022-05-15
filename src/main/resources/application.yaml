@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    #maxActive: '10'
+    initialSize: '5'
+    driverClassName: org.postgresql.Driver
+    #maxIdle: '5'
+    #minIdle: '2'
+    removeAbandoned: 'true'
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: ''
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+## In memory database
+# spring:
+#   datasource:
+#     driver-class-name: org.h2.Driver
+#     username: sa
+#     url: jdbc:h2:file:~/spring-boot-h2-db
+#     password: ''
+#   h2:
+#     console:
+#       enabled: 'true'
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+
