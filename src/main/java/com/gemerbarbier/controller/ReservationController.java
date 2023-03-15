@@ -1,12 +1,9 @@
 package com.gemerbarbier.controller;
 
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
 import com.gemerbarbier.data.Reservation;
 import com.gemerbarbier.service.ReservationService;
-
+import java.util.List;
+import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,37 +16,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ReservationController {
 
-    @Autowired
-    private ReservationService service;
+  @Autowired
+  private ReservationService service;
 
-    @PostMapping("/reservation")
-    public void createReservation(
-            @RequestParam(name = "date", required = true) @NotNull String date,
-            @RequestParam(name = "time", required = true) @NotNull String time,
-            @RequestParam(name = "name", required = true) @NotNull String name,
-            @RequestParam(name = "surname", required = true) @NotNull String surname,
-            @RequestParam(name = "email", required = true) @NotNull String email,
-            @RequestParam(name = "phoneNumber", required = true) @NotNull String phoneNumber,
-            @RequestParam(name = "note", required = true) @NotNull String note,
-            @RequestParam(name = "barber", required = true) @NotNull String barber,
-            @RequestParam(name = "cutTag", required = true) @NotNull String cutTag) {
+  @PostMapping("/reservation")
+  public void createReservation(
+      @RequestParam(name = "date", required = true) @NotNull String date,
+      @RequestParam(name = "time", required = true) @NotNull String time,
+      @RequestParam(name = "name", required = true) @NotNull String name,
+      @RequestParam(name = "surname", required = true) @NotNull String surname,
+      @RequestParam(name = "email", required = true) @NotNull String email,
+      @RequestParam(name = "phoneNumber", required = true) @NotNull String phoneNumber,
+      @RequestParam(name = "note", required = true) @NotNull String note,
+      @RequestParam(name = "barber", required = true) @NotNull String barber,
+      @RequestParam(name = "cutTag", required = true) @NotNull String cutTag) {
 
-        service.createReservation(
-                Reservation.builder().date(date).time(time).name(name).surname(surname).email(email)
-                        .phoneNumber(phoneNumber).note(note).barber(barber).cutTag(cutTag).build());
-    }
+    service.createReservation(
+        Reservation.builder().date(date).time(time).name(name).surname(surname).email(email)
+            .phoneNumber(phoneNumber).note(note).barber(barber).cutTag(cutTag).build());
+  }
 
-    @GetMapping("/reservations")
-    public List<Reservation> getAllReservations(
-            @RequestParam(name = "barber", required = true) @NotNull String barber) {
-        return service.getReservations(barber);
-    }
+  @GetMapping("/reservations")
+  public List<Reservation> getAllReservations(
+      @RequestParam(name = "barber", required = true) @NotNull String barber) {
+    return service.getReservations(barber);
+  }
 
-    @DeleteMapping("/deleteReservation")
-    public void deleteReservation(@RequestParam(name = "id", required = true) @NotNull Long id,
-            @RequestParam(name = "barber", required = true) @NotNull String barber) {
-        service.deleteReservation(id, barber);
-    }
+  @DeleteMapping("/deleteReservation")
+  public void deleteReservation(@RequestParam(name = "id", required = true) @NotNull Long id,
+      @RequestParam(name = "barber", required = true) @NotNull String barber) {
+    service.deleteReservation(id, barber);
+  }
 
 
 }
