@@ -13,6 +13,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +24,7 @@ public class ReservationService {
   private final ReservationDatesRepository datesRepository;
 
   public void createReservation(Reservation reservation) {
-    Optional<ReservationDates> optReservationDate = datesRepository.findByDateAndBarber(
+    var optReservationDate = datesRepository.findByDateAndBarber(
         reservation.getDate(), reservation.getBarber());
     if (optReservationDate.isEmpty() || !reservationTimeIsPossible(optReservationDate.get(),
         reservation.getTime())) {
