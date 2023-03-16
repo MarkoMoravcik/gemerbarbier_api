@@ -38,7 +38,8 @@ public class ReservationDatesService {
       dates.add(localDate.toString());
       localDate = localDate.plusDays(1);
     }
-    return dates.stream().filter(date -> !collectReservedDates(barber).contains(date)).toList();
+    return dates.stream().filter(date -> !collectReservedDates(barber).contains(date))
+        .collect(Collectors.toList());
   }
 
   public List<String> findAllAvaiableDates(String barber, String cutTag) {

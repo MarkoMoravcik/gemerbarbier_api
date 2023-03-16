@@ -27,7 +27,7 @@ public class ReservationService {
   public void createReservation(Reservation reservation) {
     Optional<ReservationDates> optReservationDate = datesRepository.findByDateAndBarber(
         reservation.getDate(), reservation.getBarber());
-    if (optReservationDate.isEmpty() || !reservationTimeIsPossible(optReservationDate.get(),
+    if (!optReservationDate.isPresent() || !reservationTimeIsPossible(optReservationDate.get(),
         reservation.getTime())) {
       throw new CreateReservationException(
           "Reservation was not possible to create. Reservation date does not exist or reservation time is already booked.");
