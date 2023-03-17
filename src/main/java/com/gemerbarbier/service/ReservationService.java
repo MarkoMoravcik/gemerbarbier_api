@@ -24,7 +24,7 @@ public class ReservationService {
   private final ReservationRepository reservationRepository;
   private final ReservationDatesRepository datesRepository;
 
-  public void createReservation(Reservation reservation) {
+  public void createReservationAsUser(Reservation reservation) {
     Optional<ReservationDates> optReservationDate = datesRepository.findByDateAndBarber(
         reservation.getDate(), reservation.getBarber());
     if (!optReservationDate.isPresent() || !reservationTimeIsPossible(optReservationDate.get(),
@@ -32,6 +32,10 @@ public class ReservationService {
       throw new CreateReservationException(
           "Reservation was not possible to create. Reservation date does not exist or reservation time is already booked.");
     }
+    createReservation(reservation);
+  }
+
+  public void createReservation(Reservation reservation) {
     LocalTime parsedTime = LocalTime.parse(reservation.getTime());
     String parsedDate = LocalDate.parse(reservation.getDate()).toString();
     ReservationCutConfigEnum cutType = ReservationCutConfigEnum.valueOf(reservation.getCutTag());
