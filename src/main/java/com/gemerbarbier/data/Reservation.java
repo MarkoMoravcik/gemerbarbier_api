@@ -6,7 +6,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,45 +17,42 @@ import lombok.NonNull;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "time", "barber"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"date", "time", "barber"})})
 public class Reservation {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @NonNull
-    public String date;
+  @NonNull
+  private String date;
 
-    @NonNull
-    public String time;
+  @NonNull
+  private String time;
 
-    @NonNull
-    public String name;
+  @NonNull
+  private String name;
 
-    @NonNull
-    public String surname;
+  @NonNull
+  private String surname;
 
-    @NonNull
-    public String email;
+  private String email;
 
-    @NonNull
-    public String phoneNumber;
+  private String phoneNumber;
 
-    @NonNull
-    public String barber;
+  @NonNull
+  private String barber;
 
-    public String note;
+  private String note;
 
-    public String cutType;
+  private String cutType;
 
-    @NonNull
-    public String cutTag;
+  @NonNull
+  private String cutTag;
 
-    public String color;
+  private String color;
 
-    public String startDateTime;
+  private String startDateTime;
 
-    public String endDateTime;
+  private String endDateTime;
 }
